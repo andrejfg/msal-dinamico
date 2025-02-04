@@ -1,10 +1,13 @@
-import { PublicClientApplication } from "@azure/msal-browser";
-import { API_SCOPE } from "@/msal/authConfig";
+import { MsalConfigContextProps } from "./MsalConfigProvider";
 
-export async function getCurrentToken(msalInstance: PublicClientApplication): Promise<string | null> {
+export async function getCurrentToken({ msalInstance, loginRequest: { scopes } }: MsalConfigContextProps): Promise<{ accessToken: string; idToken: string; } | null> {
+    const instance = msalInstance
+    if (!instance) {
+        return null;
+    }
     const acquireAccessToken = async () => {
-        const activeAccount = msalInstance.getActiveAccount(); // This will only return a non-null value if you have logic somewhere else that calls the setActiveAccount API
-        const accounts = msalInstance.getAllAccounts();
+        const activeAccount = instance.getActiveAccount(); // This will only return a non-null value if you have logic somewhere else that calls the setActiveAccount API
+        const accounts = instance.getAllAccounts();
 
         if (!activeAccount && accounts.length === 0) {
             /*
@@ -14,18 +17,18 @@ export async function getCurrentToken(msalInstance: PublicClientApplication): Pr
             return null;
         }
         const request = {
-            scopes: [API_SCOPE],
+            scopes,
             account: activeAccount || accounts[0]
         };
 
         try {
-            const authResult = await msalInstance.acquireTokenSilent(request);
-            return authResult.accessToken;
+            const authResult = await instance.acquireTokenSilent(request);
+            return { accessToken: authResult.accessToken, idToken: authResult.idToken };
         } catch (error) {
             // If silent acquisition fails, try acquiring token through popup or redirect
             try {
-                const authResult = await msalInstance.acquireTokenPopup(request);
-                return authResult.accessToken;
+                const authResult = await instance.acquireTokenPopup(request);
+                return { accessToken: authResult.accessToken, idToken: authResult.idToken };
             } catch (error) {
                 console.error("Error acquiring token:", error);
                 return null;

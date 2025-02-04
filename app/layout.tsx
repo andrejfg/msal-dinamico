@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import MyMsalProvider from '@/msal/MyMsalProvider'
-import SignOutButton from '@/components/SignOutButton'
+import {SignOutButton} from '@/components/SignOutButton'
 import UserAvatar from '@/components/UserAvatar'
+import { MsalConfigProvider } from '@/msal/MsalConfigProvider'
 
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'MSAL with Next.Js App Router',
@@ -20,17 +19,19 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-100 flex flex-col p-4`}>
-        <MyMsalProvider>
-          <main>
-            <div className="w-full text-center">
-              <h1 className="text-3xl font-bold text-gray-700 mb-2">You are logged in</h1>
-              <div className="m-4"><UserAvatar showInfo={true} /></div>
-              <SignOutButton />
-            </div>
-            {children}
-          </main>
-        </MyMsalProvider>
+      <body className={` bg-gray-100 flex flex-col p-4`}>
+        <MsalConfigProvider>
+          <MyMsalProvider>
+            <main>
+              <div className="w-full text-center">
+                <h1 className="text-3xl font-bold text-gray-700 mb-2">You are logged in</h1>
+                <div className="m-4"><UserAvatar showInfo={true} /></div>
+                <SignOutButton />
+              </div>
+              {children}
+            </main>
+          </MyMsalProvider>
+        </MsalConfigProvider>
       </body>
     </html>
   )

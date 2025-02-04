@@ -1,26 +1,25 @@
 'use client'
-import { AccountInfo } from "@azure/msal-browser";
-import { msalInstance } from "./msal";
+import { AccountInfo, PublicClientApplication } from "@azure/msal-browser";
 
-export function getLoggedInUser(): AccountInfo | null {
+export function getLoggedInUser(msalInstance: PublicClientApplication): AccountInfo | null {
     const account: AccountInfo | null = msalInstance?.getActiveAccount();
     return account;
 }
 
-export function getUserClaims(account?: AccountInfo | null): string[] {
+export function getUserClaims(msalInstance: PublicClientApplication, account?: AccountInfo | null): string[] {
     let userAccount = account;
     if (!userAccount) {
-        userAccount = getLoggedInUser();
+        userAccount = getLoggedInUser(msalInstance);
     }
 
     return userAccount?.idTokenClaims?.roles as string[] | undefined ?? [];
 }
 
-export function isUserAllowed(requiredRole: string, account?: AccountInfo | null, claims?: string[] | null): boolean {
+export function isUserAllowed(msalInstance: PublicClientApplication, requiredRole: string, account?: AccountInfo | null, claims?: string[] | null): boolean {
     let userClaims = claims;
 
     if (!userClaims) {
-        userClaims = getUserClaims(account);
+        userClaims = getUserClaims(msalInstance, account);
     }
 
     return userClaims ? userClaims.includes(requiredRole) : false;

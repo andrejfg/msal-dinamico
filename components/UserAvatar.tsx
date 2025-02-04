@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getUserPhotoAvatar } from "@/msal/msalGraph";
-import { msalInstance } from "@/msal/msal";
 import Image from "next/image";
 import { extractInitials } from "@/msal/userHelper";
+import { useMsalConfig } from "@/msal/MsalConfigProvider";
 
 interface UserAvatarProps {
     showInfo?: boolean;
@@ -14,12 +14,14 @@ export default function UserAvatar({ showInfo }: UserAvatarProps) {
     const [userPhoto, setUserPhoto] = useState<string | null>(null);
     const [showUserInitials, setShowUserInitials] = useState(false);
     const [userInitials, setUserInitials] = useState('?');
+    const context = useMsalConfig();
+    const msalInstance = context.msalInstance!;
 
     const user = msalInstance.getActiveAccount();
 
     useEffect(() => {
         if (user) {
-            getUserPhotoAvatar().then((response: any) => {
+            getUserPhotoAvatar(context).then((response: any) => {
                 console.log("getUserPhotoAvatar", response);
                 if (response instanceof Blob) {
                     const url = URL.createObjectURL(response);
@@ -35,7 +37,8 @@ export default function UserAvatar({ showInfo }: UserAvatarProps) {
             setUserInitials(extractInitials(user.name));
             console.log(user);
         }
-    }, []) //intentionally left the dependency blank.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     function onImgError() {
         setShowUserInitials(true);
