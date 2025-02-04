@@ -23,8 +23,6 @@ export function initializeMsal(msalInstance: PublicClientApplication) {
 
 export async function getToken(context: MsalConfigContextProps) {
   const authToken = await getCurrentToken(context);
-  console.log("AUTH TOKEN:", authToken);
-
   return authToken;
 }
 

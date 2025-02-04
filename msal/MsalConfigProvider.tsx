@@ -32,7 +32,7 @@ interface MsalProviderProps {
   children: ReactNode;
 }
 
-export const MsalConfigProvider: React.FC<MsalProviderProps> = ({ children }) => {
+const MsalConfigProvider: React.FC<MsalProviderProps> = ({ children }) => {
   const [clientId, setClientId] = useState<string|null>(localStorage.getItem("clientId"));
   const [tenantId, setTenantId] = useState<string|null>(localStorage.getItem("tenantId"));
   const [scopes, setScopes] = useState<string[]>(localStorage.getItem("scopes")?.split(",") || []);
@@ -57,7 +57,7 @@ export const MsalConfigProvider: React.FC<MsalProviderProps> = ({ children }) =>
     }
   };
 
-  const loginRequest = { scopes };
+  const loginRequest = { scopes};
   const graphConfig = { graphMeEndpoint };
 
   const msalInstance = allowedToLogin ? initializeMsal(new PublicClientApplication(msalConfig)):undefined;
@@ -97,3 +97,5 @@ export const useMsalConfig = (): MsalConfigContextProps => {
   context.token = token
   return context;
 };
+
+export default MsalConfigProvider

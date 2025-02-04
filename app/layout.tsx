@@ -3,7 +3,11 @@ import './globals.css'
 import MyMsalProvider from '@/msal/MyMsalProvider'
 import {SignOutButton} from '@/components/SignOutButton'
 import UserAvatar from '@/components/UserAvatar'
-import { MsalConfigProvider } from '@/msal/MsalConfigProvider'
+import dynamic from 'next/dynamic'
+
+const MsalConfigProvider = dynamic(() => import("@/msal/MsalConfigProvider"), {
+  ssr: false,
+});
 
 
 export const metadata: Metadata = {
