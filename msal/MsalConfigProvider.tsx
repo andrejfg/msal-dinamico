@@ -1,12 +1,6 @@
-"use client";
+"use client"
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Configuration, PublicClientApplication } from "@azure/msal-browser";
 import { getToken, initializeMsal } from "./msal";
 import MsalConfigSetup from "./MsalConfigSetup";
@@ -14,7 +8,7 @@ import MsalConfigSetup from "./MsalConfigSetup";
 export interface MsalConfigContextProps {
   msalConfig: Configuration;
   allowedToLogin: boolean;
-  msalInstance: PublicClientApplication | undefined;
+  msalInstance: PublicClientApplication | undefined
   loginRequest: { scopes: string[] };
   graphConfig: { graphMeEndpoint: string };
   setClientId: (clientId: string) => void;
@@ -24,83 +18,58 @@ export interface MsalConfigContextProps {
   token?: {
     accessToken: string;
     idToken: string;
-    refresh: string;
-  };
+  }
   config: {
     clientId: string | null;
     tenantId: string | null;
     scopes: string[];
-  };
+}
 }
 
-const MsalConfigContext = createContext<MsalConfigContextProps | undefined>(
-  undefined
-);
+const MsalConfigContext = createContext<MsalConfigContextProps | undefined>(undefined);
 
 interface MsalProviderProps {
   children: ReactNode;
 }
 
 const MsalConfigProvider: React.FC<MsalProviderProps> = ({ children }) => {
-  const [clientId, setClientId] = useState<string | null>(
-    localStorage.getItem("clientId")
-  );
-  const [tenantId, setTenantId] = useState<string | null>(
-    localStorage.getItem("tenantId")
-  );
-  const [scopes, setScopes] = useState<string[]>(
-    localStorage.getItem("scopes")?.split(",") || []
-  );
-  const [graphMeEndpoint, setGraphMeEndpoint] = useState<string>(
-    "https://graph.microsoft.com/v1.0/me"
-  );
+  const [clientId, setClientId] = useState<string|null>(localStorage.getItem("clientId"));
+  const [tenantId, setTenantId] = useState<string|null>(localStorage.getItem("tenantId"));
+  const [scopes, setScopes] = useState<string[]>(localStorage.getItem("scopes")?.split(",") || []);
+  const [graphMeEndpoint, setGraphMeEndpoint] = useState<string>("https://graph.microsoft.com/v1.0/me");
 
-  const allowedToLogin = !!clientId && !!tenantId;
+  const allowedToLogin = !!clientId && !!tenantId
 
-  const authority = tenantId
-    ? `https://login.microsoftonline.com/${tenantId}`
-    : undefined;
+  const authority = tenantId ? `https://login.microsoftonline.com/${tenantId}` : undefined
 
-  const config = { clientId, tenantId, scopes };
+  const config = {clientId, tenantId, scopes}
 
   const msalConfig: Configuration = {
     auth: {
       clientId: clientId || "",
       authority,
       redirectUri: "/",
-      postLogoutRedirectUri: "/",
+      postLogoutRedirectUri: "/"
     },
     cache: {
       cacheLocation: "localStorage",
       storeAuthStateInCookie: true,
-    },
+    }
   };
 
-  const loginRequest = { scopes };
+  const loginRequest = { scopes};
   const graphConfig = { graphMeEndpoint };
 
-  const msalInstance = allowedToLogin
-    ? initializeMsal(new PublicClientApplication(msalConfig))
-    : undefined;
+  const msalInstance = allowedToLogin ? initializeMsal(new PublicClientApplication(msalConfig)):undefined;
 
   return (
-    <MsalConfigContext.Provider
-      value={{
-        config,
-        allowedToLogin,
-        msalConfig,
-        msalInstance,
-        loginRequest,
-        graphConfig,
-        setClientId,
-        setTenantId,
-        setScopes,
-        setGraphMeEndpoint,
-      }}
-    >
+
+    <MsalConfigContext.Provider value={{config, allowedToLogin, msalConfig,msalInstance, loginRequest, graphConfig, setClientId, setTenantId, setScopes, setGraphMeEndpoint }}>
       <div className="flex flex-col flex-1 gap-4">
-        <MsalConfigSetup />
-        {allowedToLogin && children}
+        <MsalConfigSetup/>
+        {allowedToLogin && (
+          children
+        )}
       </div>
     </MsalConfigContext.Provider>
   );
@@ -115,19 +84,18 @@ export const useMsalConfig = (): MsalConfigContextProps => {
   const [token, setToken] = useState<{
     accessToken: string;
     idToken: string;
-    refresh: string;
-  }>({ accessToken: "", idToken: "", refresh: "" });
+}>({accessToken:"",idToken:""})
 
-  useEffect(() => {
-    getToken(context).then((token) => {
-      if (token) {
-        setToken(token);
-      }
-    });
-  }, [context]);
+    useEffect(()=>{
+      getToken(context).then((token)=>{
+        if(token){
+          setToken(token)
+        }
+      })
+    },[context])
 
-  context.token = token;
+  context.token = token
   return context;
 };
 
-export default MsalConfigProvider;
+export default MsalConfigProvider
