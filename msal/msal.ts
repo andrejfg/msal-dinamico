@@ -1,4 +1,8 @@
-import { AuthenticationResult, EventType, PublicClientApplication } from "@azure/msal-browser";
+import {
+  AuthenticationResult,
+  EventType,
+  PublicClientApplication,
+} from "@azure/msal-browser";
 import { getCurrentToken } from "@/msal/tokenFetcher";
 import { MsalConfigContextProps, useMsalConfig } from "./MsalConfigProvider";
 
@@ -17,8 +21,7 @@ export function initializeMsal(msalInstance: PublicClientApplication) {
       msalInstance.setActiveAccount(account);
     }
   });
-
-  return msalInstance
+  return msalInstance;
 }
 
 export async function getToken(context: MsalConfigContextProps) {
@@ -26,7 +29,10 @@ export async function getToken(context: MsalConfigContextProps) {
   return authToken;
 }
 
-export const handleLogin = ({ msalInstance, loginRequest }: MsalConfigContextProps, loginType = "redirect") => {
+export const handleLogin = (
+  { msalInstance, loginRequest }: MsalConfigContextProps,
+  loginType = "redirect"
+) => {
   if (msalInstance === undefined) return;
   if (loginType === "popup") {
     msalInstance.loginPopup(loginRequest).catch((e) => {
@@ -39,7 +45,10 @@ export const handleLogin = ({ msalInstance, loginRequest }: MsalConfigContextPro
   }
 };
 
-export const handleLogout = (msalInstance: PublicClientApplication, logoutType = "redirect") => {
+export const handleLogout = (
+  msalInstance: PublicClientApplication,
+  logoutType = "redirect"
+) => {
   if (logoutType === "popup") {
     msalInstance.logoutPopup().catch((e: any) => {
       console.error(`logoutPopup failed: ${e}`);
